@@ -133,9 +133,10 @@ $(function () {
 	for (var i = 0; i < hosts.length; i++) {
 		(function(h) {
 			console.log(h);
+			dataLoop(h);
 			setInterval(function() {
 				dataLoop(h);
-			}, 1000);
+			}, 3333);
 		})(hosts[i]);
 	}
 });
