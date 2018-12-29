@@ -1,0 +1,25 @@
+<html>
+	<head>
+		<meta charset="UTF-8"> 
+	</head>
+	<body>
+		<!-- instructions -->
+		<small>Add comma-separated RPC endpoints to the url hash, like 
+			<code><span class="this-location"></span>#http://localhost:8545,http://42.42.42.42:8080</code>
+		</small>
+
+		<!-- show that things are updating -->
+		<small id="updating-hud" style="color:green; display:none; float: right;">updating...</small>
+
+		<!-- div to stick the nodes -->
+		<div id="nodes"></div>
+
+		<!-- scripts -->
+		<script
+			  src="https://code.jquery.com/jquery-3.3.1.min.js"
+			  integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+			  crossorigin="anonymous"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/URI.js/1.19.1/URI.js"></script>
+		<script src="app.js"></script>
+	</body>
+</html>
