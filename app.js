@@ -1,7 +1,7 @@
-var refereshInterval = 10*1000;
+var refereshInterval = 3*1000;
 
 var rpcRequest = function(host, hostid, method, params, onSuccess, onError) {
-	$("."+hostid+"."+method+".updates").text(" updating...").fadeIn(0.9*refereshInterval);
+	$("."+hostid+"."+method+".updates").text(" updating...").fadeIn(0.09*refereshInterval);
 
 	// {"jsonrpc":"2.0","method":"eth_syncing","params":[],"id":1}
 	var data = {
@@ -66,6 +66,14 @@ var arrWithLimitFIFO = function(arr, lim, item) {
 
 var d = {};
 
+var jqFindFirstOrFill = function(el, id) {
+	var got = $(`${el}#${id}`);
+	if (got.length > 0) {
+		return got.first();
+	}
+	return got;
+}
+
 // preset options:
 // - 'gray-area'
 // - 'hilite-last'
@@ -127,14 +135,15 @@ var dataLoop = function(h) {
 
 	rpcRequest(h, safeH, "eth_blockNumber", [], 
 		function onOk(data) {
-			d["eth_blockNumber"] = d["eth_blockNumber"] || []
-			d["eth_blockNumber"] = arrWithLimitFIFO(d["eth_blockNumber"], 500, parseInt(data.result));
+			d[safeH] = d[safeH] || {};
+			d[safeH]["eth_blockNumber"] = d[safeH]["eth_blockNumber"] || []
+			d[safeH]["eth_blockNumber"] = arrWithLimitFIFO(d[safeH]["eth_blockNumber"], 500, parseInt(data.result));
 			$("#host-"+safeH+" .eth_blockNumber .res").html(`
 			blockNumber: ${parseInt(data.result)} <span id="spark-${safeH}-eth_blockNumber"></span>
 			<br>
 			raw: <code> ${JSON.stringify(data.result, null, 4)} </code>
 			`);
-			sparky.sparkline($(`#spark-${safeH}-eth_blockNumber`)[0], d["eth_blockNumber"], sparkOptions);
+			sparky.sparkline($(`#spark-${safeH}-eth_blockNumber`)[0], d[safeH]["eth_blockNumber"], sparkOptions);
 			handleOK(safeH, "eth_blockNumber");
 		},
 		function onErr(err) {
@@ -164,16 +173,17 @@ var dataLoop = function(h) {
 					continue;
 				}
 
-				d['eth_syncing'] = d['eth_syncing'] || {};
-				d['eth_syncing'][k] = d['eth_syncing'][k] || [];
-				d['eth_syncing'][k] = arrWithLimitFIFO(d['eth_syncing'][k], 500, parseInt(data.result[k]));
+				d[safeH] = d[safeH] || {};
+				d[safeH]['eth_syncing'] = d[safeH]['eth_syncing'] || {};
+				d[safeH]['eth_syncing'][k] = d[safeH]['eth_syncing'][k] || [];
+				d[safeH]['eth_syncing'][k] = arrWithLimitFIFO(d[safeH]['eth_syncing'][k], 500, parseInt(data.result[k]));
 
 				html=html+`
 				<tr>
 				<td>${k}</td> <td>${parseInt(data.result[k])}</td> <td id="spark-${safeH}-eth_syncing-${k}"></td>
 				</tr>
 
-				<!-- <code>${JSON.stringify(d['eth_syncing'][k])}</code> -->
+				<!-- <code>${JSON.stringify(d[safeH]['eth_syncing'][k])}</code> -->
 				`;
 			}
 			html=html+`
@@ -189,7 +199,7 @@ var dataLoop = function(h) {
 				if (!data.result.hasOwnProperty(k)) {
 					continue;
 				}
-				sparky.sparkline($(`#spark-${safeH}-eth_syncing-${k}`)[0], d['eth_syncing'][k], sparkOptions);
+				sparky.sparkline($(`#spark-${safeH}-eth_syncing-${k}`)[0], d[safeH]['eth_syncing'][k], sparkOptions);
 			}
 
 			$(".eth_syncing .error").hide();
@@ -234,11 +244,11 @@ var dataLoop = function(h) {
 
 			$("#host-" + safeH + " .admin_peers .res").html(html);
 
-			d["admin_peers"] = d["admin_peers"] || [];
-			d["admin_peers"] = arrWithLimitFIFO(d["admin_peers"], 500, data.result.length);
-			sparky.sparkline($(`#spark-${safeH}-admin_peers-count`)[0], d["admin_peers"], sparkOptions);
+			d[safeH] = d[safeH] || {};
+			d[safeH]["admin_peers"] = d[safeH]["admin_peers"] || [];
+			d[safeH]["admin_peers"] = arrWithLimitFIFO(d[safeH]["admin_peers"], 500, data.result.length);
+			sparky.sparkline($(`#spark-${safeH}-admin_peers-count`)[0], d[safeH]["admin_peers"], sparkOptions);
 
-			console.log(data);
 			handleOK(safeH, "admin_peers");
 		},
 		function onErr(err) {
